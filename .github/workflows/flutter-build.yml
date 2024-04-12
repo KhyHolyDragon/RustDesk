@@ -145,16 +145,12 @@ jobs:
           tar czf rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}-unsigned.tar.gz rustdesk
 
       - name: Sign rustdesk files
-        uses: GermanBluefox/code-sign-action@v7
-        if: env.UPLOAD_ARTIFACT == 'true'
-        with:
-          certificate: '${{ secrets.WINDOWS_PFX_BASE64 }}'
-          password: '${{ secrets.WINDOWS_PFX_PASSWORD }}'
-          certificatesha1: '${{ secrets.WINDOWS_PFX_SHA1_THUMBPRINT }}'
-          # certificatename: '${{ secrets.CERTNAME }}'
-          folder: './flutter/build/windows/x64/runner/Release/'
-          recursive: true
-          
+        if: env.UPLOAD_ARTIFACT == 'true' && env.SIGN_BASE_URL != ''
+        shell: bash
+        run: |
+          pip3 install requests argparse
+          BASE_URL=${{ secrets.SIGN_BASE_URL }} SECRET_KEY=${{ secrets.SIGN_SECRET_KEY }} python3 res/job.py sign_files ./rustdesk/
+
       - name: Build self-extracted executable
         shell: bash
         if: env.UPLOAD_ARTIFACT == 'true'
@@ -180,16 +176,11 @@ jobs:
           sha256sum ../../SignOutput/rustdesk-*.msi
 
       - name: Sign rustdesk self-extracted file
-        uses: GermanBluefox/code-sign-action@v7
-        if: env.UPLOAD_ARTIFACT == 'true'
-        with:
-          certificate: '${{ secrets.WINDOWS_PFX_BASE64 }}'
-          password: '${{ secrets.WINDOWS_PFX_PASSWORD }}'
-          certificatesha1: '${{ secrets.WINDOWS_PFX_SHA1_THUMBPRINT }}'
-          # certificatename: '${{ secrets.WINDOWS_PFX_NAME }}'
-          folder: './SignOutput'
-          recursive: false
-          
+        if: env.UPLOAD_ARTIFACT == 'true' && env.SIGN_BASE_URL != ''
+        shell: bash
+        run: |
+          BASE_URL=${{ secrets.SIGN_BASE_URL }} SECRET_KEY=${{ secrets.SIGN_SECRET_KEY }} python3 res/job.py sign_files ./SignOutput
+
       - name: Publish Release
         uses: softprops/action-gh-release@v1
         if: env.UPLOAD_ARTIFACT == 'true'
@@ -283,16 +274,12 @@ jobs:
           fi
 
       - name: Sign rustdesk files
-        uses: GermanBluefox/code-sign-action@v7
-        if: env.UPLOAD_ARTIFACT == 'true'
-        with:
-          certificate: '${{ secrets.WINDOWS_PFX_BASE64 }}'
-          password: '${{ secrets.WINDOWS_PFX_PASSWORD }}'
-          certificatesha1: '${{ secrets.WINDOWS_PFX_SHA1_THUMBPRINT }}'
-          # certificatename: '${{ secrets.CERTNAME }}'
-          folder: './Release/'
-          recursive: true
-          
+        if: env.UPLOAD_ARTIFACT == 'true' && env.SIGN_BASE_URL != ''
+        shell: bash
+        run: |
+          pip3 install requests argparse
+          BASE_URL=${{ secrets.SIGN_BASE_URL }} SECRET_KEY=${{ secrets.SIGN_SECRET_KEY }} python3 res/job.py sign_files ./Release/
+
       - name: Build self-extracted executable
         shell: bash
         run: |
@@ -306,16 +293,11 @@ jobs:
           tar czf rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}.tar.gz rustdesk
 
       - name: Sign rustdesk self-extracted file
-        uses: GermanBluefox/code-sign-action@v7
-        if: env.UPLOAD_ARTIFACT == 'true'
-        with:
-          certificate: '${{ secrets.WINDOWS_PFX_BASE64 }}'
-          password: '${{ secrets.WINDOWS_PFX_PASSWORD }}'
-          certificatesha1: '${{ secrets.WINDOWS_PFX_SHA1_THUMBPRINT }}'
-          # certificatename: '${{ secrets.WINDOWS_PFX_NAME }}'
-          folder: './SignOutput'
-          recursive: false
-          
+        if: env.UPLOAD_ARTIFACT == 'true' && env.SIGN_BASE_URL != ''
+        shell: bash
+        run: |
+          BASE_URL=${{ secrets.SIGN_BASE_URL }} SECRET_KEY=${{ secrets.SIGN_SECRET_KEY }} python3 res/job.py sign_files ./SignOutput/
+
       - name: Publish Release
         uses: softprops/action-gh-release@v1
         if: env.UPLOAD_ARTIFACT == 'true'
