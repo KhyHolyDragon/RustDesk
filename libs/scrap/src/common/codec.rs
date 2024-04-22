@@ -239,7 +239,8 @@ impl Encoder {
 
         #[allow(unused_mut)]
         let mut auto_codec = CodecName::VP9;
-        if av1_useable {
+        // aom is very slow for x86 sciter version on windows x64
+        if av1_useable && !(cfg!(windows) && std::env::consts::ARCH == "x86") {
             auto_codec = CodecName::AV1;
         }
         let mut system = System::new();
@@ -398,7 +399,7 @@ impl Decoder {
             ..Default::default()
         };
         #[cfg(feature = "hwcodec")]
-        if enable_hwcodec_option() {
+        {
             let best = HwRamDecoder::best();
             decoding.ability_h264 |= if best.h264.is_some() { 1 } else { 0 };
             decoding.ability_h265 |= if best.h265.is_some() { 1 } else { 0 };
@@ -491,7 +492,7 @@ impl Decoder {
                     valid = h264_vram.is_some();
                 }
                 #[cfg(feature = "hwcodec")]
-                if !valid && enable_hwcodec_option() {
+                if !valid {
                     match HwRamDecoder::new(format) {
                         Ok(v) => h264_ram = Some(v),
                         Err(e) => log::error!("create H264 ram decoder failed: {}", e),
@@ -517,7 +518,7 @@ impl Decoder {
                     valid = h265_vram.is_some();
                 }
                 #[cfg(feature = "hwcodec")]
-                if !valid && enable_hwcodec_option() {
+                if !valid {
                     match HwRamDecoder::new(format) {
                         Ok(v) => h265_ram = Some(v),
                         Err(e) => log::error!("create H265 ram decoder failed: {}", e),
@@ -791,10 +792,13 @@ impl Decoder {
 
 #[cfg(any(feature = "hwcodec", feature = "mediacodec"))]
 pub fn enable_hwcodec_option() -> bool {
-    if let Some(v) = Config2::get().options.get("enable-hwcodec") {
-        return v != "N";
+    if cfg!(windows) || cfg!(target_os = "linux") || cfg!(feature = "mediacodec") {
+        if let Some(v) = Config2::get().options.get("enable-hwcodec") {
+            return v != "N";
+        }
+        return true; // default is true
     }
-    return true; // default is true
+    false
 }
 #[cfg(feature = "vram")]
 pub fn enable_vram_option() -> bool {
