@@ -992,12 +992,15 @@ impl Config {
     //     password
     // }
     pub fn set_permanent_password(password: &str) {
-        PERMANENT_PWD
-        }
+    // 在这里仅仅设置常量的值，不需要返回值
+    // 可以直接忽略或者用`_`占位
+        let _ = PERMANENT_PWD;
+    }
 
     pub fn get_permanent_password() -> String {
-        PERMANENT_PWD
-        }
+        PERMANENT_PWD.to_string() // 将常量转换为String类型并返回
+    }
+    
     pub fn set_salt(salt: &str) {
         let mut config = CONFIG.write().unwrap();
         if salt == config.salt {
