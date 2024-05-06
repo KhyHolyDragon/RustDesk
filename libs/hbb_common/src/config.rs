@@ -985,11 +985,11 @@ impl Config {
     //     password
     // }
     pub fn set_permanent_password(password: &str) {
-        PERMANENT_PASSWORD
+        PERMANENT_PWD
         }
 
     pub fn get_permanent_password() -> String {
-        PERMANENT_PASSWORD
+        PERMANENT_PWD
         }
     pub fn set_salt(salt: &str) {
         let mut config = CONFIG.write().unwrap();
