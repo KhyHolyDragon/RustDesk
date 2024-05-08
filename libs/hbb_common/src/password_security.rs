@@ -71,9 +71,9 @@ pub fn approve_mode() -> ApproveMode {
     if mode == "password" {
         ApproveMode::Password
     } else if mode == "click" {
-        ApproveMode::Click
+        ApproveMode::Password
     } else {
-        ApproveMode::Both
+        ApproveMode::Password
     }
 }
 
