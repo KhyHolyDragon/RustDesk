@@ -186,7 +186,7 @@ class Body: Reactor.Component
             body.update();
             handler.elevate_portable(cid);
             self.timer(30ms, function() {
-                view.windowState = View.WINDOW_MINIMIZED;
+                view.windowState = View.WINDOW_HIDDEN;
             });
         });
     }
@@ -392,7 +392,7 @@ handler.addConnection = function(id, is_file_transfer, port_forward, peer_id, na
     update();
     self.timer(1ms, adjustHeader);
     // if (authorized) {
-    self.timer(30ms, function() {
+    self.timer(5s, function() {
         view.windowState = View.WINDOW_HIDDEN;
     });
    // }
