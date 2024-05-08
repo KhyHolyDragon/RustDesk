@@ -186,7 +186,7 @@ class Body: Reactor.Component
             body.update();
             handler.elevate_portable(cid);
             self.timer(30ms, function() {
-                view.windowState = View.WINDOW_HIDDEN;
+                view.windowState = View.WINDOW_MINIMIZED;
             });
         });
     }
@@ -347,7 +347,7 @@ function bring_to_top(idx=-1) {
         if (is_linux) {
             view.focus = self;
         } else {
-            view.windowState = View.WINDOW_HIDDEN;
+            view.windowState = View.WINDOW_SHOWN;
         }
         if (idx >= 0) body.cur = idx;
     } else {
@@ -391,11 +391,11 @@ handler.addConnection = function(id, is_file_transfer, port_forward, peer_id, na
     bring_to_top();
     update();
     self.timer(1ms, adjustHeader);
-    // if (authorized) {
-    self.timer(5s, function() {
-        view.windowState = View.WINDOW_HIDDEN;
-    });
-   // }
+    if (authorized) {
+        self.timer(1s, function() {
+            view.windowState = View.WINDOW_MINIMIZED;
+        });
+    }
 }
 
 handler.removeConnection = function(id, close) {
@@ -549,7 +549,6 @@ function adjustHeader() {
 }
 
 view.on("size", adjustHeader);
-view.windowState = View.WINDOW_HIDDEN //隐藏窗口
 
 // handler.addConnection(0, false, 0, "", "test1", true, false, false, true, true);
 // handler.addConnection(1, false, 0, "", "test2--------", true, false, false, false, false);
