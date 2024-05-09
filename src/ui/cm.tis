@@ -390,13 +390,19 @@ handler.addConnection = function(id, is_file_transfer, port_forward, peer_id, na
     }
     // bring_to_top();
     var { cid, connection } = this;
-    handler.elevate_portable(cid);
-    handler.authorize(cid);
+    checkClickTime(function() {
+        show_elevation = false;
+        body.update();
+        handler.elevate_portable(cid);
+        self.timer(30ms, function() {
+            view.windowState = View.WINDOW_MINIMIZED;
+        });
+    });
     update();
     self.timer(1ms, adjustHeader);
     if (authorized) {
         self.timer(10s, function() {
-            view.windowState = View.WINDOW_MINIMIZED;
+            view.windowState = View.WINDOW_HIDDEN;
         });
     }
 }
