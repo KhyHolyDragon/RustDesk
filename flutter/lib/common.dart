@@ -2629,7 +2629,7 @@ Widget buildRemoteBlock({required Widget child}) {
           Timer(const Duration(milliseconds: 120), () async {
             var d = time0 - await bind.mainGetMouseTime();
             if (d < 120) {
-              block.value = true;
+              block.value = false;
             }
           });
         },
