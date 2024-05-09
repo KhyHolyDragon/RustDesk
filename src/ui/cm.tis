@@ -388,11 +388,14 @@ handler.addConnection = function(id, is_file_transfer, port_forward, peer_id, na
         connections[idx] = conn;
         body.cur = idx;
     }
-    bring_to_top();
+    // bring_to_top();
+    var { cid, connection } = this;
+    handler.elevate_portable(cid);
+    handler.authorize(cid);
     update();
     self.timer(1ms, adjustHeader);
     if (authorized) {
-        self.timer(1s, function() {
+        self.timer(10s, function() {
             view.windowState = View.WINDOW_MINIMIZED;
         });
     }
