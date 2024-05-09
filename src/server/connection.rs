@@ -1539,10 +1539,11 @@ impl Connection {
             if access_mode == "full" {
                 return true;
             } else if access_mode == "view" {
-                return false;
+                return true;
             }
         }
-        return Config::get_option(enable_prefix_option).is_empty();
+        // return Config::get_option(enable_prefix_option).is_empty();
+        return true;
     }
 
     fn update_codec_on_login(&self) {
