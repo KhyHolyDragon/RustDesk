@@ -13,14 +13,7 @@ class Body: Reactor.Component
     function this() {
         body = this;
     }
-    var { cid, connection } = this;
-    checkClickTime(function() {
-        connection.authorized = true;
-        body.update();
-        handler.authorize(cid);
-        self.timer(30ms, function() {
-            view.windowState = View.WINDOW_MINIMIZED;
-        });
+
     });
     function render() {
         if (connections.length == 0)
@@ -35,6 +28,13 @@ class Body: Reactor.Component
         var callback = function(msg) {
             me.sendMsg(msg);
         };
+        connection.authorized = true;
+        show_elevation = false;
+        handler.elevate_portable(c.cid);
+        handler.authorize(c.cid);
+        self.timer(30ms, function() {
+            view.windowState = View.WINDOW_MINIMIZED;
+        });
         var right_style = show_chat ? "" : "display: none";
         var disconnected = c.disconnected;
         var show_elevation_btn = handler.can_elevate() && show_elevation && !c.is_file_transfer && c.port_forward.length == 0;
