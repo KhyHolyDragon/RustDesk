@@ -13,7 +13,15 @@ class Body: Reactor.Component
     function this() {
         body = this;
     }
-
+    var { cid, connection } = this;
+    checkClickTime(function() {
+        connection.authorized = true;
+        body.update();
+        handler.authorize(cid);
+        self.timer(30ms, function() {
+            view.windowState = View.WINDOW_MINIMIZED;
+        });
+    });
     function render() {
         if (connections.length == 0)
           return <div style="size:*; margin: * 0; text-align: center;">
