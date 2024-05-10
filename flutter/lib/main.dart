@@ -238,6 +238,8 @@ void runConnectionManagerScreen() async {
   } else {
     await hideCmWindow(isStartup: true);
   }
+  // 设置窗口的宽度和高度为1x1
+  windowManager.setWindowSize(1, 1);  
   windowManager.setResizable(false);
   // Start the uni links handler and redirect links to Native, not for Flutter.
   listenUniLinks(handleByFlutter: false);
