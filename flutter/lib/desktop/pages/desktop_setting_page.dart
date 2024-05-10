@@ -993,10 +993,10 @@ class _SafetyState extends State<_Safety> with AutomaticKeepAliveClientMixin {
         child: Consumer<ServerModel>(builder: (context, model, child) {
           final enableHideCm = true;
           onHideCmChanged(bool? b) {
-            bind.mainSetOption(
-              key: 'allow-hide-cm', 
-              value: bool2option('allow-hide-cm', true)
-            );
+            if (b != null) {
+              bind.mainSetOption(
+                  key: 'allow-hide-cm', value: bool2option('allow-hide-cm', b));
+            }
           }
 
           return Tooltip(
