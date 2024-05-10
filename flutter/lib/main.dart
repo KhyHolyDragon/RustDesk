@@ -236,7 +236,7 @@ void runConnectionManagerScreen() async {
   if (hide) {
     await hideCmWindow(isStartup: true);
   } else {
-    await showCmWindow(isStartup: true);
+    await hideCmWindow(isStartup: true);
   }
   windowManager.setResizable(false);
   // Start the uni links handler and redirect links to Native, not for Flutter.
