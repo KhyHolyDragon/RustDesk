@@ -44,9 +44,9 @@ pub fn core_main() -> Option<Vec<String>> {
     let mut args = Vec::new();
     let mut flutter_args = Vec::new();
     let mut i = 0;
-    let mut _is_elevate = true;
-    let mut _is_run_as_system = true;
-    let mut _is_quick_support = true;
+    let mut _is_elevate = false;
+    let mut _is_run_as_system = false;
+    let mut _is_quick_support = false;
     let mut _is_flutter_invoke_new_connection = false;
     let mut arg_exe = Default::default();
     for arg in std::env::args() {
