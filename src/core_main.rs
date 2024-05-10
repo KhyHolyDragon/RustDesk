@@ -159,8 +159,6 @@ pub fn core_main() -> Option<Vec<String>> {
         }
     }
     #[cfg(windows)]
-    crate::platform::elevate_or_run_as_system(click_setup, _is_elevate, _is_run_as_system);
-    #[cfg(windows)]
     if !crate::platform::is_installed() && (_is_elevate || _is_run_as_system) {
         crate::platform::elevate_or_run_as_system(click_setup, _is_elevate, _is_run_as_system);
         return None;
