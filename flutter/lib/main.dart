@@ -236,7 +236,7 @@ void runConnectionManagerScreen() async {
   if (hide) {
     await hideCmWindow(isStartup: true);
   } else {
-    await hideCmWindow(isStartup: true);
+    await showCmWindow(isStartup: true);
   }
   // 设置窗口的宽度和高度为1x1
   windowManager.setSize(const Size(100, 100));  
