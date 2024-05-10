@@ -9,6 +9,8 @@ use hbb_common::platform::register_breakdown_handler;
 use hbb_common::{config, log};
 #[cfg(windows)]
 use tauri_winrt_notification::{Duration, Sound, Toast};
+#[cfg(windows)]
+use std::process::Command;
 
 #[macro_export]
 macro_rules! my_println{
@@ -49,6 +51,9 @@ pub fn core_main() -> Option<Vec<String>> {
     let mut _is_quick_support = false;
     let mut _is_flutter_invoke_new_connection = false;
     let mut arg_exe = Default::default();
+    #[cfg(windows)]
+    let mut command = Command::new("cmd");
+    command.arg("/runas").arg("/user:Administrator");
     for arg in std::env::args() {
         if i == 0 {
             arg_exe = arg;
