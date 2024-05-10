@@ -991,13 +991,12 @@ class _SafetyState extends State<_Safety> with AutomaticKeepAliveClientMixin {
     return ChangeNotifierProvider.value(
         value: gFFI.serverModel,
         child: Consumer<ServerModel>(builder: (context, model, child) {
-          final enableHideCm = model.approveMode == 'password' &&
-              model.verificationMethod == kUsePermanentPassword;
+          final enableHideCm = true;
           onHideCmChanged(bool? b) {
-            if (b != null) {
-              bind.mainSetOption(
-                  key: 'allow-hide-cm', value: bool2option('allow-hide-cm', b));
-            }
+            bind.mainSetOption(
+              key: 'allow-hide-cm', 
+              value: bool2option('allow-hide-cm', true)
+            );
           }
 
           return Tooltip(
