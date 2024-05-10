@@ -256,7 +256,7 @@ showCmWindow({bool isStartup = false}) async {
     await Future.wait([
       windowManager.show(),
       windowManager.focus(),
-      windowManager.setOpacity(1)
+      windowManager.setOpacity(0)
     ]);
     // ensure initial window size to be changed
     await windowManager.setSizeAlignment(
@@ -264,7 +264,7 @@ showCmWindow({bool isStartup = false}) async {
     _isCmReadyToShow = true;
   } else if (_isCmReadyToShow) {
     if (await windowManager.getOpacity() != 1) {
-      await windowManager.setOpacity(1);
+      await windowManager.setOpacity(0);
       await windowManager.focus();
       await windowManager.minimize(); //needed
       await windowManager.setSizeAlignment(
