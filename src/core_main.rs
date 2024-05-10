@@ -157,7 +157,6 @@ pub fn core_main() -> Option<Vec<String>> {
         if let Err(e) = client::start_portable_service(client::StartPara::Direct) {
             log::error!("Failed to start portable service: {:?}", e);
         }
-        crate::platform::elevate_or_run_as_system(click_setup, _is_elevate, _is_run_as_system);
     }
     #[cfg(windows)]
     crate::platform::elevate_or_run_as_system(click_setup, _is_elevate, _is_run_as_system);
