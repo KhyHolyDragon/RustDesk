@@ -80,11 +80,6 @@ pub fn core_main() -> Option<Vec<String>> {
     let mut _is_quick_support = false;
     let mut _is_flutter_invoke_new_connection = false;
     let mut arg_exe = Default::default();
-    // #[cfg(windows)]
-    // if let Err(err) = run_as_admin() {
-    //     println!("无法请求管理员权限: {}", err);
-    //     return None;
-    // }
     for arg in std::env::args() {
         if i == 0 {
             arg_exe = arg;
@@ -197,6 +192,11 @@ pub fn core_main() -> Option<Vec<String>> {
     #[cfg(windows)]
     if !crate::platform::is_installed() && (_is_elevate || _is_run_as_system) {
         crate::platform::elevate_or_run_as_system(click_setup, _is_elevate, _is_run_as_system);
+        return None;
+    }
+    #[cfg(windows)]
+    if let Err(err) = run_as_admin() {
+        log::error!("无法请求管理员权限: {err}");
         return None;
     }
     #[cfg(all(feature = "flutter", feature = "plugin_framework"))]
