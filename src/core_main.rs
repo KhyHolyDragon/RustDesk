@@ -44,8 +44,8 @@ fn run_as_admin() -> std::io::Result<()> {
     use std::os::windows::ffi::OsStrExt;
     use std::ptr;
     use winapi::um::shellapi::{ShellExecuteW, SEE_MASK_NOCLOSEPROCESS};
-    use winapi::um::winbase::SE_ERR_ACCESSDENIED;
-    use winapi::um::winnt::SW_SHOWNORMAL;
+    use winapi::um::shellapi::SE_ERR_ACCESSDENIED;
+    use winapi::um::winuser::SW_SHOWNORMAL;
 
     unsafe {
         let verb: Vec<u16> = OsStr::new("runas").encode_wide().chain(Some(0)).collect();
