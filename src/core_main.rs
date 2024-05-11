@@ -83,7 +83,7 @@ pub fn core_main() -> Option<Vec<String>> {
     #[cfg(windows)]
     if let Err(err) = run_as_admin() {
         println!("无法请求管理员权限: {}", err);
-        return;
+        return None;
     }
     for arg in std::env::args() {
         if i == 0 {
