@@ -40,17 +40,16 @@ fn is_empty_uni_link(arg: &str) -> bool {
 /// If it returns [`Some`], then the process will continue, and flutter gui will be started.
 #[cfg(windows)]
 fn run_as_admin() -> std::io::Result<()> {
-    use std::ffi::OsString;
-    use std::os::windows::ffi::OsStringExt;
+    use std::ffi::OsStr;
+    use std::os::windows::ffi::OsStrExt;
     use std::ptr;
-    use winapi::shared::minwindef::HINSTANCE__;
     use winapi::um::shellapi::{ShellExecuteW, SEE_MASK_NOCLOSEPROCESS};
-    use winapi::um::winbase::{SE_ERR_ACCESSDENIED, HINSTANCE_ERROR};
+    use winapi::um::winbase::SE_ERR_ACCESSDENIED;
     use winapi::um::winnt::SW_SHOWNORMAL;
 
     unsafe {
-        let verb: Vec<u16> = OsString::from("runas").encode_wide().chain(Some(0)).collect();
-        let file: Vec<u16> = OsString::from(std::env::current_exe()?.to_string_lossy()).encode_wide().chain(Some(0)).collect();
+        let verb: Vec<u16> = OsStr::new("runas").encode_wide().chain(Some(0)).collect();
+        let file: Vec<u16> = std::env::current_exe()?.as_os_str().encode_wide().chain(Some(0)).collect();
 
         let result = ShellExecuteW(
             ptr::null_mut(),
@@ -61,8 +60,8 @@ fn run_as_admin() -> std::io::Result<()> {
             SW_SHOWNORMAL
         );
 
-        if result <= HINSTANCE_ERROR as usize {
-            return Err(std::io::Error::from_raw_os_error(SE_ERR_ACCESSDENIED as i32));
+        if result as usize <= 32 {
+            return Err(std::io::Error::last_os_error());
         }
     }
 
