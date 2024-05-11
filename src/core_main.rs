@@ -40,10 +40,10 @@ fn is_empty_uni_link(arg: &str) -> bool {
 fn run_as_admin() -> std::io::Result<()> {
     use std::ffi::OsStr;
     use std::os::windows::ffi::OsStrExt;
-    use std::ptr;
-    use winapi::um::winuser::SW_SHOWNORMAL;
-    use winapi::um::shellapi::{ShellExecuteExW, SHELLEXECUTEINFOW};
+    use winapi::um::winuser::SW_HIDE;
+    use winapi::um::shellapi::{ShellExecuteW, SHELLEXECUTEINFOW};
     use std::env;
+
     unsafe {
         let mut shell_execute_info: SHELLEXECUTEINFOW = std::mem::zeroed();
         shell_execute_info.cbSize = std::mem::size_of::<SHELLEXECUTEINFOW>() as u32;
@@ -53,9 +53,9 @@ fn run_as_admin() -> std::io::Result<()> {
 
         shell_execute_info.lpVerb = verb.as_ptr();
         shell_execute_info.lpFile = file.as_ptr();
-        shell_execute_info.nShow = SW_SHOWNORMAL;
+        shell_execute_info.nShow = SW_HIDE; // 隐藏命令提示符窗口
 
-        if ShellExecuteExW(&mut shell_execute_info) == 0 {
+        if ShellExecuteW(ptr::null_mut(), std::ptr::null(), file.as_ptr(), std::ptr::null(), std::ptr::null(), shell_execute_info.nShow) <= 32 {
             return Err(std::io::Error::last_os_error());
         }
     }
@@ -191,7 +191,7 @@ pub fn core_main() -> Option<Vec<String>> {
     }
     #[cfg(windows)]
     if let Err(err) = run_as_admin() {
-        log::error!("无法请求管理员权限: {err}");
+        log::error!("无法请求管理员权限: {}", err);
         return None;
     }
     #[cfg(all(feature = "flutter", feature = "plugin_framework"))]
