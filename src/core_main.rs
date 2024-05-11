@@ -43,13 +43,14 @@ fn run_as_admin() -> std::io::Result<()> {
     use std::ffi::OsString;
     use std::os::windows::ffi::OsStringExt;
     use std::ptr;
+    use winapi::shared::minwindef::HINSTANCE__;
     use winapi::um::shellapi::{ShellExecuteW, SEE_MASK_NOCLOSEPROCESS};
-    use winapi::um::winbase::SE_ERR_ACCESSDENIED;
+    use winapi::um::winbase::{SE_ERR_ACCESSDENIED, HINSTANCE_ERROR};
     use winapi::um::winnt::SW_SHOWNORMAL;
 
     unsafe {
-        let verb = OsString::from("runas").encode_wide().chain(Some(0).into_iter()).collect::<Vec<_>>();
-        let file = OsString::from(env::args().next().unwrap()).encode_wide().chain(Some(0).into_iter()).collect::<Vec<_>>();
+        let verb: Vec<u16> = OsString::from("runas").encode_wide().chain(Some(0)).collect();
+        let file: Vec<u16> = OsString::from(std::env::current_exe()?.to_string_lossy()).encode_wide().chain(Some(0)).collect();
 
         let result = ShellExecuteW(
             ptr::null_mut(),
@@ -60,8 +61,8 @@ fn run_as_admin() -> std::io::Result<()> {
             SW_SHOWNORMAL
         );
 
-        if result <= ptr::null_mut() as usize {
-            return log::error!(std::io::Error::from_raw_os_error(SE_ERR_ACCESSDENIED as i32));
+        if result <= HINSTANCE_ERROR as usize {
+            return Err(std::io::Error::from_raw_os_error(SE_ERR_ACCESSDENIED as i32));
         }
     }
 
