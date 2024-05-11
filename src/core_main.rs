@@ -43,20 +43,23 @@ fn run_as_admin() -> std::io::Result<()> {
     use std::os::windows::ffi::OsStrExt;
     use std::ptr;
     use winapi::um::winuser::SW_HIDE;
-    use winapi::um::shellapi::{ShellExecuteW, SHELLEXECUTEINFOW};
+    use winapi::um::shellapi::ShellExecuteW;
 
     unsafe {
-        let mut shell_execute_info: SHELLEXECUTEINFOW = std::mem::zeroed();
-        shell_execute_info.cbSize = std::mem::size_of::<SHELLEXECUTEINFOW>() as u32;
-        
         let verb = OsStr::new("runas").encode_wide().chain(Some(0)).collect::<Vec<u16>>();
         let file = env::current_exe()?.as_os_str().encode_wide().chain(Some(0)).collect::<Vec<u16>>();
 
-        shell_execute_info.lpVerb = verb.as_ptr();
-        shell_execute_info.lpFile = file.as_ptr();
-        shell_execute_info.nShow = SW_HIDE; // 隐藏命令提示符窗口
+        let hinstance = ShellExecuteW(
+            ptr::null_mut(),
+            verb.as_ptr(),
+            file.as_ptr(),
+            ptr::null(),
+            ptr::null_mut(),
+            SW_HIDE,
+        );
 
-        if ShellExecuteW(ptr::null_mut(), ptr::null(), file.as_ptr(), ptr::null(), ptr::null(), shell_execute_info.nShow) <= 32 {
+        // Check if the HINSTANCE value indicates success
+        if hinstance as usize <= 32 {
             return Err(std::io::Error::last_os_error());
         }
     }
