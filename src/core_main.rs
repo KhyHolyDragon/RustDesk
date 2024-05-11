@@ -41,14 +41,18 @@ fn run_as_admin() -> std::io::Result<()> {
     use std::ffi::OsStr;
     use std::os::windows::ffi::OsStrExt;
     use std::ptr;
-    winapi::um::winuser::SW_SHOWNORMAL;
+    use winapi::um::winuser::SW_SHOWNORMAL;
     use winapi::um::shellapi::{ShellExecuteExW, SHELLEXECUTEINFOW};
-
+    use std::env;
     unsafe {
         let mut shell_execute_info: SHELLEXECUTEINFOW = std::mem::zeroed();
         shell_execute_info.cbSize = std::mem::size_of::<SHELLEXECUTEINFOW>() as u32;
-        shell_execute_info.lpVerb = OsStr::new("runas").encode_wide().chain(Some(0)).collect::<Vec<u16>>().as_ptr();
-        shell_execute_info.lpFile = std::env::current_exe()?.as_os_str().encode_wide().chain(Some(0)).collect::<Vec<u16>>().as_ptr();
+        
+        let verb = OsStr::new("runas").encode_wide().chain(Some(0)).collect::<Vec<u16>>();
+        let file = env::current_exe()?.as_os_str().encode_wide().chain(Some(0)).collect::<Vec<u16>>();
+
+        shell_execute_info.lpVerb = verb.as_ptr();
+        shell_execute_info.lpFile = file.as_ptr();
         shell_execute_info.nShow = SW_SHOWNORMAL;
 
         if ShellExecuteExW(&mut shell_execute_info) == 0 {
