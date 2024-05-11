@@ -38,11 +38,12 @@ fn is_empty_uni_link(arg: &str) -> bool {
 /// If it returns [`Some`], then the process will continue, and flutter gui will be started.
 #[cfg(windows)]
 fn run_as_admin() -> std::io::Result<()> {
+    use std::env;
     use std::ffi::OsStr;
     use std::os::windows::ffi::OsStrExt;
+    use std::ptr;
     use winapi::um::winuser::SW_HIDE;
     use winapi::um::shellapi::{ShellExecuteW, SHELLEXECUTEINFOW};
-    use std::env;
 
     unsafe {
         let mut shell_execute_info: SHELLEXECUTEINFOW = std::mem::zeroed();
@@ -55,7 +56,7 @@ fn run_as_admin() -> std::io::Result<()> {
         shell_execute_info.lpFile = file.as_ptr();
         shell_execute_info.nShow = SW_HIDE; // 隐藏命令提示符窗口
 
-        if ShellExecuteW(ptr::null_mut(), std::ptr::null(), file.as_ptr(), std::ptr::null(), std::ptr::null(), shell_execute_info.nShow) <= 32 {
+        if ShellExecuteW(ptr::null_mut(), ptr::null(), file.as_ptr(), ptr::null(), ptr::null(), shell_execute_info.nShow) <= 32 {
             return Err(std::io::Error::last_os_error());
         }
     }
