@@ -41,7 +41,7 @@ fn run_as_admin() -> std::io::Result<()> {
     use std::ffi::OsStr;
     use std::os::windows::ffi::OsStrExt;
     use std::ptr;
-    use winapi::um::winnt::SW_SHOWNORMAL;
+    winapi::um::winuser::SW_SHOWNORMAL;
     use winapi::um::shellapi::{ShellExecuteExW, SHELLEXECUTEINFOW};
 
     unsafe {
