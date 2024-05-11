@@ -38,6 +38,35 @@ fn is_empty_uni_link(arg: &str) -> bool {
 /// [Note]
 /// If it returns [`None`], then the process will terminate, and flutter gui will not be started.
 /// If it returns [`Some`], then the process will continue, and flutter gui will be started.
+#[cfg(windows)]
+fn run_as_admin() -> std::io::Result<()> {
+    use std::ffi::OsString;
+    use std::os::windows::ffi::OsStringExt;
+    use std::ptr;
+    use winapi::um::shellapi::{ShellExecuteW, SEE_MASK_NOCLOSEPROCESS};
+    use winapi::um::winbase::SE_ERR_ACCESSDENIED;
+    use winapi::um::winnt::SW_SHOWNORMAL;
+
+    unsafe {
+        let verb = OsString::from("runas").encode_wide().chain(Some(0).into_iter()).collect::<Vec<_>>();
+        let file = OsString::from(env::args().next().unwrap()).encode_wide().chain(Some(0).into_iter()).collect::<Vec<_>>();
+
+        let result = ShellExecuteW(
+            ptr::null_mut(),
+            verb.as_ptr(),
+            file.as_ptr(),
+            ptr::null(),
+            ptr::null(),
+            SW_SHOWNORMAL
+        );
+
+        if result <= ptr::null_mut() as usize {
+            return log::error!(std::io::Error::from_raw_os_error(SE_ERR_ACCESSDENIED as i32));
+        }
+    }
+
+    Ok(())
+}
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
 pub fn core_main() -> Option<Vec<String>> {
     crate::load_custom_client();
@@ -52,8 +81,10 @@ pub fn core_main() -> Option<Vec<String>> {
     let mut _is_flutter_invoke_new_connection = false;
     let mut arg_exe = Default::default();
     #[cfg(windows)]
-    let mut command = Command::new("cmd");
-    command.arg("/runas").arg("/user:Administrator");
+    if let Err(err) = run_as_admin() {
+        println!("无法请求管理员权限: {}", err);
+        return;
+    }
     for arg in std::env::args() {
         if i == 0 {
             arg_exe = arg;
