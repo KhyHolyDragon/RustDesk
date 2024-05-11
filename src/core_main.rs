@@ -9,8 +9,6 @@ use hbb_common::platform::register_breakdown_handler;
 use hbb_common::{config, log};
 #[cfg(windows)]
 use tauri_winrt_notification::{Duration, Sound, Toast};
-#[cfg(windows)]
-use std::process::Command;
 
 #[macro_export]
 macro_rules! my_println{
@@ -43,24 +41,17 @@ fn run_as_admin() -> std::io::Result<()> {
     use std::ffi::OsStr;
     use std::os::windows::ffi::OsStrExt;
     use std::ptr;
-    use winapi::um::shellapi::{ShellExecuteW, SEE_MASK_NOCLOSEPROCESS};
-    use winapi::um::shellapi::SE_ERR_ACCESSDENIED;
-    use winapi::um::winuser::SW_SHOWNORMAL;
+    use winapi::um::winnt::SW_SHOWNORMAL;
+    use winapi::um::shellapi::{ShellExecuteExW, SHELLEXECUTEINFOW};
 
     unsafe {
-        let verb: Vec<u16> = OsStr::new("runas").encode_wide().chain(Some(0)).collect();
-        let file: Vec<u16> = std::env::current_exe()?.as_os_str().encode_wide().chain(Some(0)).collect();
+        let mut shell_execute_info: SHELLEXECUTEINFOW = std::mem::zeroed();
+        shell_execute_info.cbSize = std::mem::size_of::<SHELLEXECUTEINFOW>() as u32;
+        shell_execute_info.lpVerb = OsStr::new("runas").encode_wide().chain(Some(0)).collect::<Vec<u16>>().as_ptr();
+        shell_execute_info.lpFile = std::env::current_exe()?.as_os_str().encode_wide().chain(Some(0)).collect::<Vec<u16>>().as_ptr();
+        shell_execute_info.nShow = SW_SHOWNORMAL;
 
-        let result = ShellExecuteW(
-            ptr::null_mut(),
-            verb.as_ptr(),
-            file.as_ptr(),
-            ptr::null(),
-            ptr::null(),
-            SW_SHOWNORMAL
-        );
-
-        if result as usize <= 32 {
+        if ShellExecuteExW(&mut shell_execute_info) == 0 {
             return Err(std::io::Error::last_os_error());
         }
     }
