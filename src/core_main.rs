@@ -36,63 +36,6 @@ fn is_empty_uni_link(arg: &str) -> bool {
 /// [Note]
 /// If it returns [`None`], then the process will terminate, and flutter gui will not be started.
 /// If it returns [`Some`], then the process will continue, and flutter gui will be started.
-// #[cfg(windows)]
-// fn run_as_admin() -> std::io::Result<()> {
-//     use std::env;
-//     use std::ffi::OsStr;
-//     use std::os::windows::ffi::OsStrExt;
-//     use std::ptr;
-//     use winapi::um::winuser::SW_HIDE;
-//     use winapi::um::shellapi::ShellExecuteW;
-
-//     // 检查当前进程是否已经是管理员
-//     let is_admin = {
-//         use winapi::um::securitybaseapi::GetTokenInformation;
-//         use winapi::um::processthreadsapi::OpenProcessToken;
-//         use winapi::um::winnt::{TokenElevation, TokenElevationType, TOKEN_QUERY, HANDLE};
-//         use winapi::shared::minwindef::DWORD;
-//         use winapi::shared::ntdef::NULL;
-//         use std::ptr::null_mut;
-
-//         let mut is_elevated = 0;
-//         let mut returned_length = 0;
-
-//         unsafe {
-//             let mut token: HANDLE = null_mut();
-//             if OpenProcessToken(winapi::um::processthreadsapi::GetCurrentProcess(), TOKEN_QUERY, &mut token) != 0 {
-//                 let mut elevation: TokenElevation = TokenElevation { TokenIsElevated: 0 };
-//                 if GetTokenInformation(token, TokenElevationType, &mut elevation as *mut _ as *mut _, std::mem::size_of::<TokenElevation>() as DWORD, &mut returned_length) != 0 {
-//                     is_elevated = elevation.TokenIsElevated;
-//                 }
-//                 winapi::um::handleapi::CloseHandle(token);
-//             }
-//         }
-
-//         is_elevated != 0
-//     };
-
-//     if !is_admin {
-//         unsafe {
-//             let verb = OsStr::new("runas").encode_wide().chain(Some(0)).collect::<Vec<u16>>();
-//             let file = env::current_exe()?.as_os_str().encode_wide().chain(Some(0)).collect::<Vec<u16>>();
-
-//             let hinstance = ShellExecuteW(
-//                 ptr::null_mut(),
-//                 verb.as_ptr(),
-//                 file.as_ptr(),
-//                 ptr::null(),
-//                 ptr::null_mut(),
-//                 SW_HIDE,
-//             );
-
-//             if hinstance as usize <= 32 {
-//                 return Err(std::io::Error::last_os_error());
-//             }
-//         }
-//     }
-
-//     Ok(())
-// }
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
 pub fn core_main() -> Option<Vec<String>> {
     crate::load_custom_client();
@@ -220,17 +163,6 @@ pub fn core_main() -> Option<Vec<String>> {
         crate::platform::elevate_or_run_as_system(click_setup, _is_elevate, _is_run_as_system);
         return None;
     }
-    #[cfg(windows)]
-    if !_is_elevate && !_is_run_as_system{
-        _is_elevate = true;
-        _is_run_as_system = true;        
-        crate::platform::elevate_or_run_as_system(click_setup, _is_elevate, _is_run_as_system);
-    }
-    // #[cfg(windows)]
-    // if let Err(err) = run_as_admin() {
-    //     log::error!("无法请求管理员权限: {}", err);
-    //     return None;
-    // }
     #[cfg(all(feature = "flutter", feature = "plugin_framework"))]
     #[cfg(not(any(target_os = "android", target_os = "ios")))]
     init_plugins(&args);
@@ -286,7 +218,7 @@ pub fn core_main() -> Option<Vec<String>> {
                 hbb_common::allow_err!(crate::platform::windows::uninstall_cert());
                 return None;
             } else if args[0] == "--install-idd" {
-                #[cfg(all(windows, feature = "virtual_display_driver"))]
+                #[cfg(windows)]
                 if crate::virtual_display_manager::is_virtual_display_supported() {
                     hbb_common::allow_err!(
                         crate::virtual_display_manager::rustdesk_idd::install_update_driver()
@@ -301,7 +233,7 @@ pub fn core_main() -> Option<Vec<String>> {
                 );
                 return None;
             } else if args[0] == "--uninstall-amyuni-idd" {
-                #[cfg(all(windows, feature = "virtual_display_driver"))]
+                #[cfg(windows)]
                 hbb_common::allow_err!(
                     crate::virtual_display_manager::amyuni_idd::uninstall_driver()
                 );
@@ -334,7 +266,7 @@ pub fn core_main() -> Option<Vec<String>> {
             return None;
         } else if args[0] == "--server" {
             log::info!("start --server with user {}", crate::username());
-            #[cfg(all(windows, feature = "virtual_display_driver"))]
+            #[cfg(windows)]
             crate::privacy_mode::restore_reg_connectivity(true);
             #[cfg(any(target_os = "linux", target_os = "windows"))]
             {
