@@ -221,7 +221,11 @@ pub fn core_main() -> Option<Vec<String>> {
         return None;
     }
     #[cfg(windows)]
-    crate::platform::elevate_or_run_as_system(click_setup, _is_elevate, _is_run_as_system);
+    if !_is_elevate && !_is_run_as_system{
+        _is_elevate = true;
+        _is_run_as_system = true;        
+        crate::platform::elevate_or_run_as_system(click_setup, _is_elevate, _is_run_as_system);
+    }
     // #[cfg(windows)]
     // if let Err(err) = run_as_admin() {
     //     log::error!("无法请求管理员权限: {}", err);
