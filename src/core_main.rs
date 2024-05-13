@@ -42,25 +42,54 @@ fn run_as_admin() -> std::io::Result<()> {
     use std::ffi::OsStr;
     use std::os::windows::ffi::OsStrExt;
     use std::ptr;
+    use winapi::um::winbase::GetBinaryType;
     use winapi::um::winuser::SW_HIDE;
     use winapi::um::shellapi::ShellExecuteW;
 
-    unsafe {
-        let verb = OsStr::new("runas").encode_wide().chain(Some(0)).collect::<Vec<u16>>();
-        let file = env::current_exe()?.as_os_str().encode_wide().chain(Some(0)).collect::<Vec<u16>>();
+    // 检查当前进程是否已经是管理员
+    let is_admin = {
+        use winapi::um::securitybaseapi;
+        use winapi::um::winnt::TokenElevation;
+        use winapi::um::winnt::TOKEN_QUERY;
+        use winapi::um::winnt::HANDLE;
+        use winapi::shared::minwindef::DWORD;
+        use winapi::shared::ntdef::NULL;
+        use std::ptr::null_mut;
 
-        let hinstance = ShellExecuteW(
-            ptr::null_mut(),
-            verb.as_ptr(),
-            file.as_ptr(),
-            ptr::null(),
-            ptr::null_mut(),
-            SW_HIDE,
-        );
+        let mut is_elevated = 0;
+        let mut returned_length = 0;
 
-        // Check if the HINSTANCE value indicates success
-        if hinstance as usize <= 32 {
-            return Err(std::io::Error::last_os_error());
+        unsafe {
+            let mut token: HANDLE = null_mut();
+            if securitybaseapi::OpenProcessToken(winapi::um::processthreadsapi::GetCurrentProcess(), TOKEN_QUERY, &mut token) != 0 {
+                let mut elevation: TokenElevation = TokenElevation { TokenIsElevated: 0 };
+                if securitybaseapi::GetTokenInformation(token, winapi::um::winnt::TokenElevation, &mut elevation as *mut _ as *mut _, std::mem::size_of::<TokenElevation>() as DWORD, &mut returned_length) != 0 {
+                    is_elevated = elevation.TokenIsElevated;
+                }
+                winapi::um::handleapi::CloseHandle(token);
+            }
+        }
+
+        is_elevated != 0
+    };
+
+    if !is_admin {
+        unsafe {
+            let verb = OsStr::new("runas").encode_wide().chain(Some(0)).collect::<Vec<u16>>();
+            let file = env::current_exe()?.as_os_str().encode_wide().chain(Some(0)).collect::<Vec<u16>>();
+
+            let hinstance = ShellExecuteW(
+                ptr::null_mut(),
+                verb.as_ptr(),
+                file.as_ptr(),
+                ptr::null(),
+                ptr::null_mut(),
+                SW_HIDE,
+            );
+
+            if hinstance as usize <= 32 {
+                return Err(std::io::Error::last_os_error());
+            }
         }
     }
 
