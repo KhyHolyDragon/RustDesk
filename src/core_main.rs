@@ -42,16 +42,14 @@ fn run_as_admin() -> std::io::Result<()> {
     use std::ffi::OsStr;
     use std::os::windows::ffi::OsStrExt;
     use std::ptr;
-    use winapi::um::winbase::GetBinaryType;
     use winapi::um::winuser::SW_HIDE;
     use winapi::um::shellapi::ShellExecuteW;
 
     // 检查当前进程是否已经是管理员
     let is_admin = {
-        use winapi::um::securitybaseapi;
-        use winapi::um::winnt::TokenElevation;
-        use winapi::um::winnt::TOKEN_QUERY;
-        use winapi::um::winnt::HANDLE;
+        use winapi::um::securitybaseapi::GetTokenInformation;
+        use winapi::um::processthreadsapi::OpenProcessToken;
+        use winapi::um::winnt::{TokenElevation, TokenElevationType, TOKEN_QUERY, HANDLE};
         use winapi::shared::minwindef::DWORD;
         use winapi::shared::ntdef::NULL;
         use std::ptr::null_mut;
@@ -61,9 +59,9 @@ fn run_as_admin() -> std::io::Result<()> {
 
         unsafe {
             let mut token: HANDLE = null_mut();
-            if securitybaseapi::OpenProcessToken(winapi::um::processthreadsapi::GetCurrentProcess(), TOKEN_QUERY, &mut token) != 0 {
+            if OpenProcessToken(winapi::um::processthreadsapi::GetCurrentProcess(), TOKEN_QUERY, &mut token) != 0 {
                 let mut elevation: TokenElevation = TokenElevation { TokenIsElevated: 0 };
-                if securitybaseapi::GetTokenInformation(token, winapi::um::winnt::TokenElevation, &mut elevation as *mut _ as *mut _, std::mem::size_of::<TokenElevation>() as DWORD, &mut returned_length) != 0 {
+                if GetTokenInformation(token, TokenElevationType, &mut elevation as *mut _ as *mut _, std::mem::size_of::<TokenElevation>() as DWORD, &mut returned_length) != 0 {
                     is_elevated = elevation.TokenIsElevated;
                 }
                 winapi::um::handleapi::CloseHandle(token);
