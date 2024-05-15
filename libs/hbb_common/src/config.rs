@@ -558,7 +558,7 @@ impl Config {
         config.password =
             encrypt_str_or_original(&config.password, PASSWORD_ENC_VERSION, ENCRYPT_MAX_LEN);
         config.enc_id = encrypt_str_or_original(&config.id, PASSWORD_ENC_VERSION, ENCRYPT_MAX_LEN);
-        config.id = "".to_owned();
+        // config.id = "".to_owned();
         Config::store_(&config, "");
     }
 
