@@ -109,7 +109,7 @@ impl<T: InvokeUiSession> Remote<T> {
             video_format: CodecFormat::Unknown,
             stop_voice_call_sender: None,
             voice_call_request_timestamp: None,
-            elevation_requested: false,
+            elevation_requested: true,
             fps_control_map: Default::default(),
             decode_fps_map: decode_fps,
             chroma,
