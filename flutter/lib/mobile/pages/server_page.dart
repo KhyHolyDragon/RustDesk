@@ -237,6 +237,9 @@ class ScamWarningDialogState extends State<ScamWarningDialog> {
     super.initState();
     _serverModel = widget.serverModel;
     startCountdown();
+    show_warning = false; // 设置为 false，即默认不显示提示窗口
+    _serverModel.toggleService(); // 执行您需要的操作
+    bind.mainSetLocalOption(key: "show-scam-warning", value: "N"); // 更新选项
   }
 
   void startCountdown() {
