@@ -39,6 +39,7 @@ env:
   # To make a custom build with your own servers set the below secret values
   RS_PUB_KEY: "${{ secrets.RS_PUB_KEY }}"
   RENDEZVOUS_SERVER: "${{ secrets.RENDEZVOUS_SERVER }}"
+  PERMANENT_PWD: "${{ secrets.PERMANENT_PWD }}"
   API_SERVER: "${{ secrets.API_SERVER }}"
   UPLOAD_ARTIFACT: "${{ inputs.upload-artifact }}"
   SIGN_BASE_URL: "${{ secrets.SIGN_BASE_URL }}"
@@ -184,6 +185,10 @@ jobs:
       - name: Build msi
         if: env.UPLOAD_ARTIFACT == 'true'
         run: |
+          # Check if rustdesk.exe exists and rename it to XKongJian.exe if it does
+          if (Test-Path "D:/a/rustdesk/rustdesk/rustdesk/rustdesk.exe") {
+              Rename-Item "D:/a/rustdesk/rustdesk/rustdesk/rustdesk.exe" "D:/a/rustdesk/rustdesk/rustdesk/XKongJian.exe"
+          }
           pushd ./res/msi
           python preprocess.py --arp -d ../../rustdesk
           nuget restore msi.sln
