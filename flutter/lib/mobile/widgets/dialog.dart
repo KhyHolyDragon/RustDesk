@@ -244,17 +244,17 @@ void showServerSettingsWithValue(
         dialogButton('Cancel', onPressed: () {
           close();
         }, isOutline: true),
-        dialogButton(
-          'OK',
-          onPressed: () async {
-            if (await submit()) {
-              close();
-              showToast(translate('Successful'));
-            } else {
-              showToast(translate('Failed'));
-            }
-          },
-        ),
+        // dialogButton(
+        //   'OK',
+        //   onPressed: () async {
+        //     if (await submit()) {
+        //       close();
+        //       showToast(translate('Successful'));
+        //     } else {
+        //       showToast(translate('Failed'));
+        //     }
+        //   },
+        // ),
       ],
     );
   });
