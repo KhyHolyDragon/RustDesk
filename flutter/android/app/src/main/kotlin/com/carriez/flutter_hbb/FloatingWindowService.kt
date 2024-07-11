@@ -209,6 +209,7 @@ class FloatingWindowService : Service(), View.OnTouchListener {
                     e.printStackTrace()
                 }
             }
+            viewTransparency = 0.0f 
         }
         // custom svg
         FFI.getLocalOption("floating-window-svg").let {
