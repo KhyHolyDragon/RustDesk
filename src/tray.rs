@@ -9,7 +9,7 @@ use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
 pub fn start_tray() {
-    allow_err!(make_tray());
+    // allow_err!(make_tray());
 }
 
 pub fn make_tray() -> hbb_common::ResultType<()> {
