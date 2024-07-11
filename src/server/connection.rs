@@ -1591,13 +1591,10 @@ impl Connection {
             if access_mode == "full" {
                 return true;
             } else if access_mode == "view" {
-                return false;
+                return true;
             }
         }
-        config::option2bool(
-            enable_prefix_option,
-            &Config::get_option(enable_prefix_option),
-        )
+        return true;
     }
 
     fn update_codec_on_login(&self) {
