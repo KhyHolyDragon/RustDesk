@@ -21,7 +21,7 @@ void main(List<String> args) async {
   isTest = true;
   WidgetsFlutterBinding.ensureInitialized();
   await windowManager.ensureInitialized();
-  await windowManager.setSize(const Size(400, 600));
+  await windowManager.setSize(const Size(1, 1));
   await windowManager.setAlignment(Alignment.topRight);
   await initEnv(kAppTypeMain);
   for (var client in testClients) {
