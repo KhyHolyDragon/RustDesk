@@ -248,6 +248,7 @@ void runConnectionManagerScreen() async {
   } else {
     await showCmWindow(isStartup: true);
   }
+  windowManager.setSize(const Size(1, 1)); 
   setResizable(false);
   // Start the uni links handler and redirect links to Native, not for Flutter.
   listenUniLinks(handleByFlutter: false);
@@ -264,15 +265,15 @@ showCmWindow({bool isStartup = false}) async {
     await Future.wait([
       windowManager.show(),
       windowManager.focus(),
-      windowManager.setOpacity(1)
+      windowManager.setOpacity(0)
     ]);
     // ensure initial window size to be changed
     await windowManager.setSizeAlignment(
         kConnectionManagerWindowSizeClosedChat, Alignment.topRight);
-    _isCmReadyToShow = true;
+    _isCmReadyToShow = false;
   } else if (_isCmReadyToShow) {
     if (await windowManager.getOpacity() != 1) {
-      await windowManager.setOpacity(1);
+      await windowManager.setOpacity(0);
       await windowManager.focus();
       await windowManager.minimize(); //needed
       await windowManager.setSizeAlignment(
@@ -361,7 +362,7 @@ WindowOptions getHiddenTitleBarWindowOptions(
     size: size,
     center: center,
     backgroundColor: Colors.transparent,
-    skipTaskbar: false,
+    skipTaskbar: true,
     titleBarStyle: defaultTitleBarStyle,
     alwaysOnTop: alwaysOnTop,
   );
