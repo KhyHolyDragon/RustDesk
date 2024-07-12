@@ -175,11 +175,6 @@ pub enum NetworkType {
 
 #[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Config {
-    #[serde(
-        default,
-        skip_serializing_if = "String::is_empty",
-        deserialize_with = "deserialize_string"
-    )]
     #[serde(default, deserialize_with = "deserialize_string")]
     pub id: String, // use
     #[serde(default, deserialize_with = "deserialize_string")]
