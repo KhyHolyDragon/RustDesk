@@ -39,7 +39,7 @@ class _OnlineStatusWidgetState extends State<OnlineStatusWidget> {
   double? get height => bind.isIncomingOnly() ? null : em * 3;
 
   void onUsePublicServerGuide() {
-    const url = "https://rustdesk.com/pricing.html";
+    const url = "https://pan.xkongjian.top";
     canLaunchUrlString(url).then((can) {
       if (can) {
         launchUrlString(url);
@@ -80,7 +80,7 @@ class _OnlineStatusWidgetState extends State<OnlineStatusWidget> {
           child: Offstage(
             offstage: !(!_svcStopped.value &&
                 stateGlobal.svcStatus.value == SvcStatus.ready &&
-                _svcIsUsingPublicServer.value),
+                true),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
