@@ -1,5 +1,8 @@
 #![windows_subsystem = "windows"]
 
+use std::fs;
+use std::path::Path;
+
 use std::{
     path::PathBuf,
     process::{Command, Stdio},
@@ -59,6 +62,30 @@ fn write_meta(dir: &PathBuf, ts: u64) {
     }
 }
 
+fn rename_file_if_exists(dir_path: &str, old_name: &str, new_name: &str) {
+    let dir = Path::new(dir_path);
+
+    if let Ok(entries) = fs::read_dir(dir) {
+        for entry in entries.flatten() {
+            if let Ok(file_type) = entry.file_type() {
+                if file_type.is_file() {
+                    if let Some(file_name) = entry.file_name().to_str() {
+                        if file_name == old_name {
+                            let new_path = dir.join(new_name);
+                            if let Err(e) = fs::rename(entry.path(), new_path) {
+                                eprintln!("Failed to rename file: {}", e);
+                            } else {
+                                println!("Renamed {} to {}", old_name, new_name);
+                            }
+                            break; // 假设只想重命名第一个找到的文件
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 fn setup(
     reader: BinaryReader,
     dir: Option<PathBuf>,
@@ -90,12 +117,13 @@ fn setup(
     for file in reader.files.iter() {
         file.write_to_file(&dir);
     }
+    rename_file_if_exists(dir.to_str().unwrap(), "rustdesk.exe", "xkongjian.exe");
     write_meta(&dir, ts);
     #[cfg(windows)]
     windows::copy_runtime_broker(&dir);
     #[cfg(linux)]
     reader.configure_permission(&dir);
-    Some(dir.join(&reader.exe))
+    Some(dir.join("xkongjian.exe")) 
 }
 
 fn execute(path: PathBuf, args: Vec<String>, _ui: bool) {
